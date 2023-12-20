@@ -22,12 +22,42 @@ from keras import optimizers
 class modelMaintenance :
 
     def __init__(self, num_layers, num_input, num_output, loss, optimizer, metrics) -> None:
-        self.training_history = None
-        self.MODELFILEPATH = '../Model/best_model.h5'
-        self.model = self._init_model(num_layers, num_input, num_output, loss, optimizer, metrics)
+            """
+            Initializes the ModelMaintenance object.
+
+            Args:
+                num_layers (int): The number of layers in the model.
+                num_input (int): The number of input features.
+                num_output (int): The number of output classes.
+                loss (str): The loss function to be used during training.
+                optimizer (str): The optimizer to be used during training.
+                metrics (list): The evaluation metrics to be used during training.
+
+            Returns:
+                None
+            """
+            self.training_history = None
+            self.MODELFILEPATH = '../Model/best_model.h5'
+            self.model = self._init_model(num_layers, num_input, num_output, loss, optimizer, metrics)
 
 
     def _init_model(self, num_layers, num_input, num_output, loss, optimizer, metrics, activation='relu', dropout=0.2):
+        """
+        Initialize the model with the specified parameters.
+
+        Args:
+            num_layers (int): Number of hidden layers in the model.
+            num_input (int): Number of input features.
+            num_output (int): Number of output classes.
+            loss (str): Loss function to be used during training.
+            optimizer (str): Optimization algorithm to be used during training.
+            metrics (list): List of evaluation metrics to be used during training.
+            activation (str, optional): Activation function for the hidden layers. Defaults to 'relu'.
+            dropout (float, optional): Dropout rate for regularization. Defaults to 0.2.
+
+        Returns:
+            keras.models.Sequential: The initialized model.
+        """
         model = Sequential()
         model.add(Input(shape=(num_input,)))
 
@@ -43,10 +73,22 @@ class modelMaintenance :
         return model
     
     def summary(self):
+        """
+        Prints a summary of the model.
+        """
         self.model.summary()
 
     def plot_model(self):
-        visualizer(self.model,file_name='model', file_format='png', view=False)
+        """
+        Plots the model architecture and displays it.
+
+        Parameters:
+            None
+
+        Returns:
+            None
+        """
+        visualizer(self.model, file_name='model', file_format='png', view=False)
         img = mpimg.imread('model.png')
 
         plt.imshow(img)
@@ -55,40 +97,77 @@ class modelMaintenance :
         #keras.utils.plot_model(self.model, show_shapes=True)
     
     def train(self, X_train, y_train, X_test, y_test, batch_size, epochs, verbose=1):
-        
-        self.training_history = self.model.fit(
-            x=X_train,
-            y=y_train,
-            batch_size=batch_size,
-            epochs=epochs, 
-            verbose=verbose, 
-            validation_data=(X_test, y_test), 
-            callbacks=self.callbacks)
+            """
+            Trains the model using the provided training data and evaluates it on the provided test data.
+
+            Parameters:
+                X_train (numpy.ndarray): The input features for training.
+                y_train (numpy.ndarray): The target labels for training.
+                X_test (numpy.ndarray): The input features for testing.
+                y_test (numpy.ndarray): The target labels for testing.
+                batch_size (int): The number of samples per gradient update.
+                epochs (int): The number of times to iterate over the entire training dataset.
+                verbose (int, optional): Verbosity mode. 0 = silent, 1 = progress bar, 2 = one line per epoch.
+
+            Returns:
+                None
+            """
+            
+            self.training_history = self.model.fit(
+                x=X_train,
+                y=y_train,
+                batch_size=batch_size,
+                epochs=epochs, 
+                verbose=verbose, 
+                validation_data=(X_test, y_test), 
+                callbacks=self.callbacks)
 
     def plot_history(self):
-        list_metrics = []
-    
-        for st in self.training_history.history.keys():
-            if not st.startswith('val') and not st.__contains__('lr'):
-                list_metrics.append(st)
-
-        fig, axs = plt.subplots(len(list_metrics), figsize=(8,12))
-        fig.tight_layout(pad=3.0)
-    
-        for i, metrics in enumerate(list_metrics):
-            length = len(self.training_history.history[metrics])
-            axs[i].plot(np.arange(length), self.training_history.history[metrics], label='train '+metrics)
-            axs[i].plot(np.arange(length), self.training_history.history['val_'+metrics], label='test '+metrics)
-            axs[i].set_title(metrics)
-            axs[i].legend()
+            """
+            Plots the training and validation metrics over epochs.
+            """
+            list_metrics = []
         
-        plt.show()
+            for st in self.training_history.history.keys():
+                if not st.startswith('val') and not st.__contains__('lr'):
+                    list_metrics.append(st)
+
+            fig, axs = plt.subplots(len(list_metrics), figsize=(8,12))
+            fig.tight_layout(pad=3.0)
+        
+            for i, metrics in enumerate(list_metrics):
+                length = len(self.training_history.history[metrics])
+                axs[i].plot(np.arange(length), self.training_history.history[metrics], label='train '+metrics)
+                axs[i].plot(np.arange(length), self.training_history.history['val_'+metrics], label='test '+metrics)
+                axs[i].set_title(metrics)
+                axs[i].legend()
+            
+            plt.show()
 
     def predict(self, X):
+        """
+        Predicts the output for the given input data.
+
+        Parameters:
+            X (array-like): Input data for prediction.
+
+        Returns:
+            array-like: Predicted output.
+        """
         return self.model.predict(X)
     
     def plot_confusion_matrix(self, y_test, y_pred, name_target):
+        """
+        Plots the confusion matrix for the predicted labels.
 
+        Parameters:
+            y_test (array-like): True labels of the test data.
+            y_pred (array-like): Predicted labels of the test data.
+            name_target (array-like): Names of the target labels.
+
+        Returns:
+            None
+        """
         # Compute confusion matrix
         cm = confusion_matrix(y_test, y_pred)
         np.set_printoptions(precision=2)
@@ -104,20 +183,34 @@ class modelMaintenance :
         ax.set_yticklabels(name_target, rotation=45)
 
     def _create_callbacks(self):
-        self.ModelCheckpoint = ModelCheckpoint(
-            filepath=self.MODELFILEPATH,
-            save_best_only=True,
-            monitor='val_loss')
-        
-        self.early_stopping = EarlyStopping(monitor='val_loss', patience=3)
-        
-        self.reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=5, min_lr=1e-4)
-        
-        return [self.ModelCheckpoint, self.early_stopping, self.reduce_lr]
+            """
+            Create and return a list of callbacks for model training.
+
+            Returns:
+                list: A list of callbacks including ModelCheckpoint, EarlyStopping, and ReduceLROnPlateau.
+            """
+            self.ModelCheckpoint = ModelCheckpoint(
+                filepath=self.MODELFILEPATH,
+                save_best_only=True,
+                monitor='val_loss')
+            
+            self.early_stopping = EarlyStopping(monitor='val_loss', patience=3)
+            
+            self.reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=5, min_lr=1e-4)
+            
+            return [self.ModelCheckpoint, self.early_stopping, self.reduce_lr]
     
     def print_evaluation(self, X_test, y_test, y_pred):
         """
-        Affiche les metriques du modele sur le jeu de donne de test
+        Prints the evaluation metrics for the model's performance.
+
+        Parameters:
+            X_test (array-like): The input features for testing.
+            y_test (array-like): The true labels for testing.
+            y_pred (array-like): The predicted labels for testing.
+
+        Returns:
+            The average of the evaluation metrics.
         """
         results = self.model.evaluate(X_test, y_test, verbose=2)
         for name, value in zip(self.model.metrics_names, results):

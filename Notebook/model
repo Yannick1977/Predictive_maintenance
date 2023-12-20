@@ -130,7 +130,7 @@ Activation: relu" color=white fontcolor=black fontsize=18 shape=rectangle]
 	subgraph cluster_1 {
 		color=white
 		rank=same
-		101010 [label="Units: 32 (+22 more)
+		101010 [label="Units: 256 (+246 more)
 Activation: relu" color=white fontcolor=black fontsize=18 shape=rectangle]
 		11 [color="#3498db" fontcolor="#3498db" shape=circle style=filled]
 		12 [color="#3498db" fontcolor="#3498db" shape=circle style=filled]
@@ -171,7 +171,7 @@ Rate: 0.2" fillcolor="#f39c12" fontcolor=black shape=Mcircle style=filled]
 	subgraph cluster_3 {
 		color=white
 		rank=same
-		212121 [label="Units: 16 (+6 more)
+		212121 [label="Units: 128 (+118 more)
 Activation: relu" color=white fontcolor=black fontsize=18 shape=rectangle]
 		22 [color="#3498db" fontcolor="#3498db" shape=circle style=filled]
 		23 [color="#3498db" fontcolor="#3498db" shape=circle style=filled]
@@ -204,17 +204,140 @@ Rate: 0.2" fillcolor="#f39c12" fontcolor=black shape=Mcircle style=filled]
 	32 -> 35
 	32 -> 36
 	32 -> 37
+	32 -> 38
+	32 -> 39
+	32 -> 40
+	32 -> 41
+	32 -> 42
+	subgraph cluster_5 {
+		color=white
+		rank=same
+		323232 [label="Units: 64 (+54 more)
+Activation: relu" color=white fontcolor=black fontsize=18 shape=rectangle]
+		33 [color="#3498db" fontcolor="#3498db" shape=circle style=filled]
+		34 [color="#3498db" fontcolor="#3498db" shape=circle style=filled]
+		35 [color="#3498db" fontcolor="#3498db" shape=circle style=filled]
+		36 [color="#3498db" fontcolor="#3498db" shape=circle style=filled]
+		37 [color="#3498db" fontcolor="#3498db" shape=circle style=filled]
+		38 [color="#3498db" fontcolor="#3498db" shape=circle style=filled]
+		39 [color="#3498db" fontcolor="#3498db" shape=circle style=filled]
+		40 [color="#3498db" fontcolor="#3498db" shape=circle style=filled]
+		41 [color="#3498db" fontcolor="#3498db" shape=circle style=filled]
+		42 [color="#3498db" fontcolor="#3498db" shape=circle style=filled]
+	}
+	33 -> 43
+	34 -> 43
+	35 -> 43
+	36 -> 43
+	37 -> 43
+	38 -> 43
+	39 -> 43
+	40 -> 43
+	41 -> 43
+	42 -> 43
+	subgraph cluster_6 {
+		color=white
+		43 [label="Dropout
+Rate: 0.2" fillcolor="#f39c12" fontcolor=black shape=Mcircle style=filled]
+	}
+	43 -> 44
+	43 -> 45
+	43 -> 46
+	43 -> 47
+	43 -> 48
+	43 -> 49
+	43 -> 50
+	43 -> 51
+	43 -> 52
+	43 -> 53
+	subgraph cluster_7 {
+		color=white
+		rank=same
+		434343 [label="Units: 32 (+22 more)
+Activation: relu" color=white fontcolor=black fontsize=18 shape=rectangle]
+		44 [color="#3498db" fontcolor="#3498db" shape=circle style=filled]
+		45 [color="#3498db" fontcolor="#3498db" shape=circle style=filled]
+		46 [color="#3498db" fontcolor="#3498db" shape=circle style=filled]
+		47 [color="#3498db" fontcolor="#3498db" shape=circle style=filled]
+		48 [color="#3498db" fontcolor="#3498db" shape=circle style=filled]
+		49 [color="#3498db" fontcolor="#3498db" shape=circle style=filled]
+		50 [color="#3498db" fontcolor="#3498db" shape=circle style=filled]
+		51 [color="#3498db" fontcolor="#3498db" shape=circle style=filled]
+		52 [color="#3498db" fontcolor="#3498db" shape=circle style=filled]
+		53 [color="#3498db" fontcolor="#3498db" shape=circle style=filled]
+	}
+	44 -> 54
+	45 -> 54
+	46 -> 54
+	47 -> 54
+	48 -> 54
+	49 -> 54
+	50 -> 54
+	51 -> 54
+	52 -> 54
+	53 -> 54
+	subgraph cluster_8 {
+		color=white
+		54 [label="Dropout
+Rate: 0.2" fillcolor="#f39c12" fontcolor=black shape=Mcircle style=filled]
+	}
+	54 -> 55
+	54 -> 56
+	54 -> 57
+	54 -> 58
+	54 -> 59
+	54 -> 60
+	54 -> 61
+	54 -> 62
+	54 -> 63
+	54 -> 64
+	subgraph cluster_9 {
+		color=white
+		rank=same
+		545454 [label="Units: 16 (+6 more)
+Activation: relu" color=white fontcolor=black fontsize=18 shape=rectangle]
+		55 [color="#3498db" fontcolor="#3498db" shape=circle style=filled]
+		56 [color="#3498db" fontcolor="#3498db" shape=circle style=filled]
+		57 [color="#3498db" fontcolor="#3498db" shape=circle style=filled]
+		58 [color="#3498db" fontcolor="#3498db" shape=circle style=filled]
+		59 [color="#3498db" fontcolor="#3498db" shape=circle style=filled]
+		60 [color="#3498db" fontcolor="#3498db" shape=circle style=filled]
+		61 [color="#3498db" fontcolor="#3498db" shape=circle style=filled]
+		62 [color="#3498db" fontcolor="#3498db" shape=circle style=filled]
+		63 [color="#3498db" fontcolor="#3498db" shape=circle style=filled]
+		64 [color="#3498db" fontcolor="#3498db" shape=circle style=filled]
+	}
+	55 -> 65
+	56 -> 65
+	57 -> 65
+	58 -> 65
+	59 -> 65
+	60 -> 65
+	61 -> 65
+	62 -> 65
+	63 -> 65
+	64 -> 65
+	subgraph cluster_10 {
+		color=white
+		65 [label="Dropout
+Rate: 0.2" fillcolor="#f39c12" fontcolor=black shape=Mcircle style=filled]
+	}
+	65 -> 66
+	65 -> 67
+	65 -> 68
+	65 -> 69
+	65 -> 70
 	subgraph cluster_output {
-		323232 [label="Output Units: 5
+		656565 [label="Output Units: 5
 Activation: softmax" color=white fontcolor=black fontsize=18 shape=rectangle]
 		color=white
 		rank=same
 		labeljust=1
-		33 [color="#e74c3c" fontcolor="#e74c3c" shape=circle style=filled]
-		34 [color="#e74c3c" fontcolor="#e74c3c" shape=circle style=filled]
-		35 [color="#e74c3c" fontcolor="#e74c3c" shape=circle style=filled]
-		36 [color="#e74c3c" fontcolor="#e74c3c" shape=circle style=filled]
-		37 [color="#e74c3c" fontcolor="#e74c3c" shape=circle style=filled]
+		66 [color="#e74c3c" fontcolor="#e74c3c" shape=circle style=filled]
+		67 [color="#e74c3c" fontcolor="#e74c3c" shape=circle style=filled]
+		68 [color="#e74c3c" fontcolor="#e74c3c" shape=circle style=filled]
+		69 [color="#e74c3c" fontcolor="#e74c3c" shape=circle style=filled]
+		70 [color="#e74c3c" fontcolor="#e74c3c" shape=circle style=filled]
 	}
 	arrowShape=none
 }
