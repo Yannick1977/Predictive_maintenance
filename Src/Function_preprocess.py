@@ -5,7 +5,35 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder, OrdinalEncoder
 from imblearn.over_sampling import SMOTE
 
-def preprocess(df_):
+def preprocess(df_, chx_target:bool, chx_smote:bool):
+    """
+    Preprocesses the dataset.
+    
+    This function performs the following preprocessing steps on the dataset:
+    1. Drops rows where the 'Failure Type' column is equal to 'Random Failures'.
+    2. Drops rows where the 'Failure Type' column is equal to 'No Failure' and the 'Target' column is equal to 1.
+    3. Memorizes the columns where the data type is 'object' (categorical) and removes the 'Failure Type' column from the list.
+    4. Memorizes the columns where the data type is not 'object' (numerical) and removes the 'Target' column from the list.
+    5. Drops the 'Target' column from the dataset and renames the 'Failure Type' column to 'Target'.
+    6. Creates a ColumnTransformer object to apply one-hot encoding to the categorical columns and standard scaling to the numerical columns.
+    7. Splits the dataset into training, validation, and test sets.
+    8. Fits and transforms the datasets using the ColumnTransformer.
+    9. Creates a dictionary to map the target values to their corresponding indices.
+    10. Saves the validation dataset to a CSV file.
+    11. Applies SMOTE (Synthetic Minority Over-sampling Technique) to the training and test datasets.
+    12. Saves the resampled training and test datasets to CSV files.
+    
+    Parameters:
+    - df_: The input dataset to be preprocessed.
+    - chx_target: A boolean value indicating whether to check the 'Target' column for preprocessing.
+    - chx_smote: A boolean value indicating whether to apply SMOTE to the training and test datasets.
+    
+    Returns:
+    - df_train: The preprocessed training dataset.
+    - df_test: The preprocessed test dataset.
+    - dict_target_inv_: A dictionary mapping the target values to their corresponding indices.
+    """
+
     # Drop rows where 'Failure Type' column is equal to 'Random Failures'
     df_ = df_[df_['Failure Type'] != 'Random Failures']
 
@@ -20,9 +48,13 @@ def preprocess(df_):
     num_cols = df_.select_dtypes(exclude='O').columns.to_list()
     num_cols.remove('Target')
 
-    # Drop the 'Target' column and rename the 'Failure Type' column to 'Target'
-    df_.drop(columns=['Target'], inplace=True)
-    df_.rename(columns={'Failure Type': 'Target'}, inplace=True)
+    if chx_target:
+        # Drop the 'Target' column and rename the 'Failure Type' column to 'Target'
+        df_.drop(columns=['Target'], inplace=True)
+        df_.rename(columns={'Failure Type': 'Target'}, inplace=True)
+    else:
+        # Drop the 'Failure Type' column
+        df_.drop(columns=['Failure Type'], inplace=True)
 
     # Create a ColumnTransformer object
     ct_X_ = ColumnTransformer(
@@ -32,11 +64,20 @@ def preprocess(df_):
             #("fail", OrdinalEncoder(), ['Target'])
         ],
         remainder='passthrough')
-    ct_y_ = ColumnTransformer(
-        transformers=[
-            ("fail", OrdinalEncoder(), ['Target'])
-        ],
-        remainder='passthrough')
+    
+    if chx_target:
+        ct_y_ = ColumnTransformer(
+            transformers=[
+                ("fail", OrdinalEncoder(), ['Target'])
+            ],
+            remainder='passthrough')
+    else:
+        df_['Target'] = df_['Target'].replace({1: 'With_Failure', 0: 'No Failure'})
+        ct_y_ = ColumnTransformer(
+            transformers=[
+                ("fail", OrdinalEncoder(), ['Target'])
+            ],
+            remainder='passthrough')
 
     # Create different dataset for X train, test and validation
 
@@ -73,9 +114,14 @@ def preprocess(df_):
     create_df_from_X_y(X_=X_val_trans, y_=y_val_trans, columns_y=dict_target_inv_.values()).to_csv('../data/predictive_maintenance_validation.csv', index=False)
 
     # Apply SMOTE to the dataset train and test
-    X_train_res_, y_train_res_ = apply_smote(X_=X_train_trans, y_=y_train_trans)
-    X_test_res_, y_test_res_ = apply_smote(X_=X_test_trans, y_=y_test_trans)
-
+    if chx_smote:
+        X_train_res_, y_train_res_ = apply_smote(X_=X_train_trans, y_=y_train_trans)
+        X_test_res_, y_test_res_ = apply_smote(X_=X_test_trans, y_=y_test_trans)
+    else:
+        X_train_res_ = X_train_trans.copy()
+        y_train_res_ = y_train_trans.copy()
+        X_test_res_ = X_test_trans.copy()
+        y_test_res_ = y_test_trans.copy()
 
     # Save the train and test dataset
     df_train = create_df_from_X_y(X_=X_train_res_, y_=y_train_res_, columns_y=dict_target_inv_.values())

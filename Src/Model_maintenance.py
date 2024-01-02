@@ -14,6 +14,7 @@ from keras.regularizers import l2, l1
 from keras.metrics import Accuracy, SparseCategoricalAccuracy, CategoricalAccuracy, AUC, \
     PrecisionAtRecall, Recall, Precision
 from sklearn.metrics import confusion_matrix, cohen_kappa_score, f1_score
+from sklearn.utils import class_weight
 import seaborn as sns
 from keras_visualizer import visualizer
 from keras import optimizers
@@ -102,9 +103,9 @@ class modelMaintenance :
 
             Parameters:
                 X_train (numpy.ndarray): The input features for training.
-                y_train (numpy.ndarray): The target labels for training.
+                y_train (numpy.ndarray): The target labels for training (one hot encoding).
                 X_test (numpy.ndarray): The input features for testing.
-                y_test (numpy.ndarray): The target labels for testing.
+                y_test (numpy.ndarray): The target labels for testing (one hot encoding).
                 batch_size (int): The number of samples per gradient update.
                 epochs (int): The number of times to iterate over the entire training dataset.
                 verbose (int, optional): Verbosity mode. 0 = silent, 1 = progress bar, 2 = one line per epoch.
@@ -112,10 +113,16 @@ class modelMaintenance :
             Returns:
                 None
             """
+
+            y_train_labels = np.argmax(y_train, axis=1)
+
+            class_weights = class_weight.compute_class_weight(class_weight='balanced', classes=np.unique(y_train_labels), y=y_train_labels)
+            class_weights = dict(enumerate(class_weights))
             
             self.training_history = self.model.fit(
                 x=X_train,
                 y=y_train,
+                class_weight=class_weights,
                 batch_size=batch_size,
                 epochs=epochs, 
                 verbose=verbose, 
@@ -176,8 +183,8 @@ class modelMaintenance :
         # Plot non-normalized confusion matrix
         ax = sns.heatmap(cm, annot=True, cmap="Blues", fmt=".0f")
         
-        #ax.set_xlabel('Label de l\'axe X')
-        #ax.set_ylabel('Label de l\'axe Y')
+        ax.set_xlabel('Predicted label')
+        ax.set_ylabel('True label')
 
         ax.set_xticklabels(name_target, rotation=45)
         ax.set_yticklabels(name_target, rotation=45)
@@ -200,7 +207,7 @@ class modelMaintenance :
             
             return [self.ModelCheckpoint, self.early_stopping, self.reduce_lr]
     
-    def print_evaluation(self, X_test, y_test, y_pred):
+    def print_evaluation(self, X_test, y_test, y_pred, verbose):
         """
         Prints the evaluation metrics for the model's performance.
 
@@ -212,18 +219,24 @@ class modelMaintenance :
         Returns:
             The average of the evaluation metrics.
         """
+        score_details = {}
         results = self.model.evaluate(X_test, y_test, verbose=2)
         for name, value in zip(self.model.metrics_names, results):
-            print(name, ': ', value)
+            if verbose:
+                print(name, ': ', value)
+            score_details[name] = value
 
         y_test_flat = y_test.flatten()
         y_pred_flat = y_pred.flatten()
 
         kappa = cohen_kappa_score(y_test_flat, y_pred_flat > 0.5)
         f1 = f1_score(y_test_flat, y_pred_flat > 0.5, average='micro')
-        print('kappa: ', kappa)
-        print('F1_score: ', f1)
-        return np.mean([np.mean(results[1:]), f1, kappa])
+        if verbose:
+            print('kappa: ', kappa)
+            print('F1_score: ', f1)
+        score_details['kappa'] = kappa
+        score_details['F1_score'] = f1
+        return np.mean([np.mean(results[1:]), f1, kappa]), score_details
     
     def _generer_multiples_de_16(self,n):
         liste = [16]
